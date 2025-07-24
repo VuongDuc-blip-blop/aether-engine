@@ -1,4 +1,7 @@
 
+using AetherEngine.API.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace AetherEngine.API
 {
     public class Program
@@ -9,10 +12,19 @@ namespace AetherEngine.API
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddNewtonsoftJson();
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+
+
+            var connectionString = builder.Configuration.GetConnectionString("AetherDatabase")
+                ?? throw new InvalidOperationException("Connection string AetherDatabase not found");
+            builder.Services.AddDbContext<AetherEngineDbContext>(options => options.UseSqlServer(connectionString));
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
 
             var app = builder.Build();
 
